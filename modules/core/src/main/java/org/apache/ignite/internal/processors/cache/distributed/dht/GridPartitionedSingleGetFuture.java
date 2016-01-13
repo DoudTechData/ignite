@@ -349,23 +349,6 @@ public class GridPartitionedSingleGetFuture extends GridFutureAdapter<Object> im
     }
 
     /**
-     * @param part Partition.
-     * @return {@code True} if partition is in owned state.
-     */
-    private boolean partitionOwned(int part) {
-        return cctx.topology().partitionState(cctx.localNodeId(), part) == OWNING;
-    }
-
-    /**
-     * @param topVer Topology version.
-     * @return Exception.
-     */
-    private ClusterTopologyServerNotFoundException serverNotFoundError(AffinityTopologyVersion topVer) {
-        return new ClusterTopologyServerNotFoundException("Failed to map keys for cache " +
-            "(all partition nodes left the grid) [topVer=" + topVer + ", cache=" + cctx.name() + ']');
-    }
-
-    /**
      * @param topVer Topology version.
      * @param part Partition.
      * @return {@code True} if future completed.
@@ -647,7 +630,7 @@ public class GridPartitionedSingleGetFuture extends GridFutureAdapter<Object> im
                 }
                 else {
                     if (!keepCacheObjects) {
-                        Object res = cctx.unwrapBinaryIfNeeded(val, !deserializeBinary && !skipVals);
+                        Object res = cctx.unwrapBinaryIfNeeded(val, !deserializeBinary);
 
                         onDone(res);
                     }
@@ -661,6 +644,23 @@ public class GridPartitionedSingleGetFuture extends GridFutureAdapter<Object> im
         catch (Exception e) {
             onDone(e);
         }
+    }
+
+    /**
+     * @param part Partition.
+     * @return {@code True} if partition is in owned state.
+     */
+    private boolean partitionOwned(int part) {
+        return cctx.topology().partitionState(cctx.localNodeId(), part) == OWNING;
+    }
+
+    /**
+     * @param topVer Topology version.
+     * @return Exception.
+     */
+    private ClusterTopologyServerNotFoundException serverNotFoundError(AffinityTopologyVersion topVer) {
+        return new ClusterTopologyServerNotFoundException("Failed to map keys for cache " +
+            "(all partition nodes left the grid) [topVer=" + topVer + ", cache=" + cctx.name() + ']');
     }
 
     /**

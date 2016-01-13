@@ -79,6 +79,8 @@ public class IgniteCacheGetRestartTest extends GridCommonAbstractTest {
             client.remove();
         }
 
+        cfg.setConsistentId(gridName);
+
         return cfg;
     }
 
@@ -168,7 +170,12 @@ public class IgniteCacheGetRestartTest extends GridCommonAbstractTest {
 
             IgniteInternalFuture<?> fut1 = GridTestUtils.runMultiThreadedAsync(new Callable<Void>() {
                 @Override public Void call() throws Exception {
-                    IgniteCache<Object, Object> cache = ignite(nodeIdx.getAndIncrement()).cache(ccfg.getName());
+                    Ignite ignite = ignite(nodeIdx.getAndIncrement());
+
+                    log.info("Check get [node=" + ignite.name() +
+                        ", client=" + ignite.configuration().isClientMode() + ']');
+
+                    IgniteCache<Object, Object> cache = ignite.cache(ccfg.getName());
 
                     while (U.currentTimeMillis() < stopTime)
                         checkGet(cache);
