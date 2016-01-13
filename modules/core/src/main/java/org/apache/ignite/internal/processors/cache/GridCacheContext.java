@@ -1969,7 +1969,7 @@ public class GridCacheContext<K, V> implements Externalizable {
      * @return {@code True} if cache 'get' operation is allowed to get entry locally.
      */
     public boolean allowFastLocalRead(int part, List<ClusterNode> affNodes, AffinityTopologyVersion topVer) {
-        return affinityNode() && hasPartition(part, affNodes, topVer);
+        return affinityNode() && rebalanceEnabled() && hasPartition(part, affNodes, topVer);
     }
 
     /**

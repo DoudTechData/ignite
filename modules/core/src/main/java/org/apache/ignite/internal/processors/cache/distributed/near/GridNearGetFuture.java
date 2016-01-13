@@ -470,7 +470,7 @@ public final class GridNearGetFuture<K, V> extends CacheDistributedGetFutureAdap
                 if (v == null) {
                     boolean fastLocGet = allowLocRead && cctx.allowFastLocalRead(part, affNodes, topVer);
 
-                    if (fastLocGet && localDhtGet(key, part, topVer, affNodes, isNear))
+                    if (fastLocGet && localDhtGet(key, part, topVer, isNear))
                         break;
 
                     ClusterNode affNode = affinityNode(affNodes);
@@ -482,6 +482,9 @@ public final class GridNearGetFuture<K, V> extends CacheDistributedGetFutureAdap
                             return saved;
                         }
                     }
+
+                    if (cctx.cache().configuration().isStatisticsEnabled() && !skipVals && !affNode.isLocal())
+                        cache().metrics0().onRead(false);
 
                     LinkedHashMap<KeyCacheObject, Boolean> keys = mapped.get(affNode);
 
@@ -547,14 +550,12 @@ public final class GridNearGetFuture<K, V> extends CacheDistributedGetFutureAdap
      * @param key Key.
      * @param part Partition.
      * @param topVer Topology version.
-     * @param affNodes All affinity nodes.
      * @param nearRead {@code True} if tried to read from near cache.
      * @return {@code True} if there is no need to further search value.
      */
     private boolean localDhtGet(KeyCacheObject key,
         int part,
         AffinityTopologyVersion topVer,
-        List<ClusterNode> affNodes,
         boolean nearRead) {
         GridDhtCacheAdapter<K, V> dht = cache().dht();
 
@@ -618,10 +619,7 @@ public final class GridNearGetFuture<K, V> extends CacheDistributedGetFutureAdap
                     return true;
                 }
                 else {
-                    if (cctx.cache().configuration().isStatisticsEnabled() && !skipVals && !affNodes.get(0).isLocal())
-                        cache().metrics0().onRead(false);
-
-                    boolean topStable = topVer.equals(cctx.topology().topologyVersion());
+                    boolean topStable = cctx.isReplicated() || topVer.equals(cctx.topology().topologyVersion());
 
                     // Entry not found, do not continue search if topology did not change and there is no store.
                     return !cctx.store().configured() && (topStable || partitionOwned(part));
