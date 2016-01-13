@@ -476,11 +476,9 @@ public final class GridNearGetFuture<K, V> extends CacheDistributedGetFutureAdap
                     ClusterNode affNode = affinityNode(affNodes);
 
                     if (affNode == null) {
-                        if (affNode == null) {
-                            onDone(serverNotFoundError(topVer));
+                        onDone(serverNotFoundError(topVer));
 
-                            return saved;
-                        }
+                        return saved;
                     }
 
                     if (cctx.cache().configuration().isStatisticsEnabled() && !skipVals && !affNode.isLocal())

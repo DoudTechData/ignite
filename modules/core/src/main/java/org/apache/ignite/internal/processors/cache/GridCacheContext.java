@@ -1979,7 +1979,7 @@ public class GridCacheContext<K, V> implements Externalizable {
      * @return {@code True} if partition is available locally.
      */
     private boolean hasPartition(int part, List<ClusterNode> affNodes, AffinityTopologyVersion topVer) {
-        return topology().rebalanceFinished(topVer) && (isReplicated() || affNodes.contains(locNode))
+        return (topology().rebalanceFinished(topVer) && (isReplicated() || affNodes.contains(locNode)))
             || partitionOwned(part);
     }
 

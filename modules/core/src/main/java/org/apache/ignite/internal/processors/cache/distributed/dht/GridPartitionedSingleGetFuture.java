@@ -445,6 +445,9 @@ public class GridPartitionedSingleGetFuture extends GridFutureAdapter<Object> im
 
                 // Entry not found, complete future with null result if topology did not change and there is no store.
                 if (!cctx.store().configured() && (topStable || partitionOwned(part))) {
+                    if (!skipVals && cctx.config().isStatisticsEnabled())
+                        colocated.metrics0().onRead(false);
+
                     if (skipVals)
                         setSkipValueResult(false, null);
                     else

@@ -170,11 +170,17 @@ public class IgniteCacheSingleGetMessageTest extends GridCommonAbstractTest {
 
         assertNull(cache.get(key));
 
-        checkMessages(spi, primarySpi);
+        if (backup)
+            checkNoMessages(spi, primarySpi);
+        else
+            checkMessages(spi, primarySpi);
 
         assertFalse(cache.containsKey(key));
 
-        checkMessages(spi, primarySpi);
+        if (backup)
+            checkNoMessages(spi, primarySpi);
+        else
+            checkMessages(spi, primarySpi);
 
         cache.put(key, 1);
 
@@ -201,7 +207,10 @@ public class IgniteCacheSingleGetMessageTest extends GridCommonAbstractTest {
                 tx.commit();
             }
 
-            checkMessages(spi, primarySpi);
+            if (backup)
+                checkNoMessages(spi, primarySpi);
+            else
+                checkMessages(spi, primarySpi);
 
             try (Transaction tx = node.transactions().txStart(OPTIMISTIC, REPEATABLE_READ)) {
                 assertFalse(cache.containsKey(key));
@@ -209,7 +218,10 @@ public class IgniteCacheSingleGetMessageTest extends GridCommonAbstractTest {
                 tx.commit();
             }
 
-            checkMessages(spi, primarySpi);
+            if (backup)
+                checkNoMessages(spi, primarySpi);
+            else
+                checkMessages(spi, primarySpi);
 
             cache.put(key, 1);
 
