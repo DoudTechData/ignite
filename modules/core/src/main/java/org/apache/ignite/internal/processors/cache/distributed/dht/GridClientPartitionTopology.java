@@ -882,7 +882,7 @@ public class GridClientPartitionTopology implements GridDhtPartitionTopology {
 
     /** {@inheritDoc} */
     @Override public boolean rebalanceFinished(AffinityTopologyVersion topVer) {
-        assert false;
+        assert false : "Should not be called on non-affinity node";
 
         return false;
     }

@@ -326,7 +326,7 @@ public class IgniteDynamicCacheStartNoExchangeTimeoutTest extends GridCommonAbst
             for (int i = 0; i < 100; i++) {
                 cache.put(key, key);
 
-                assertEquals("Invalid value for node: " + ignite.name(), key, cache.get(key));
+                assertEquals(key, cache.get(key));
 
                 key++;
             }

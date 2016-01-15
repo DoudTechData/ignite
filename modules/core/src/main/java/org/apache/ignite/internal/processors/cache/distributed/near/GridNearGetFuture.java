@@ -548,7 +548,7 @@ public final class GridNearGetFuture<K, V> extends CacheDistributedGetFutureAdap
      * @param key Key.
      * @param part Partition.
      * @param topVer Topology version.
-     * @param nearRead {@code True} if tried to read from near cache.
+     * @param nearRead {@code True} if already tried to read from near cache.
      * @return {@code True} if there is no need to further search value.
      */
     private boolean localDhtGet(KeyCacheObject key,
@@ -556,6 +556,8 @@ public final class GridNearGetFuture<K, V> extends CacheDistributedGetFutureAdap
         AffinityTopologyVersion topVer,
         boolean nearRead) {
         GridDhtCacheAdapter<K, V> dht = cache().dht();
+
+        assert dht.context().affinityNode() : this;
 
         while (true) {
             GridCacheEntryEx dhtEntry = null;
