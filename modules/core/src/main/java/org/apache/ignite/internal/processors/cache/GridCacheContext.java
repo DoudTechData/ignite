@@ -1435,6 +1435,13 @@ public class GridCacheContext<K, V> implements Externalizable {
     }
 
     /**
+     * @return {@code True} if store and read-through mode are enabled in configuration.
+     */
+    public boolean readThroughConfigured() {
+        return store().configured() && cacheCfg.isReadThrough();
+    }
+
+    /**
      * @return {@code True} if {@link CacheConfiguration#isLoadPreviousValue()} flag is set.
      */
     public boolean loadPreviousValue() {
@@ -1981,16 +1988,10 @@ public class GridCacheContext<K, V> implements Externalizable {
     private boolean hasPartition(int part, List<ClusterNode> affNodes, AffinityTopologyVersion topVer) {
         assert affinityNode();
 
-        return (topology().rebalanceFinished(topVer) && (isReplicated() || affNodes.contains(locNode)))
-            || partitionOwned(part);
-    }
+        GridDhtPartitionTopology top = topology();
 
-    /**
-     * @param part Partition.
-     * @return {@code True} if partition is in owned state.
-     */
-    private boolean partitionOwned(int part) {
-        return topology().partitionState(localNodeId(), part) == OWNING;
+        return (top.rebalanceFinished(topVer) && (isReplicated() || affNodes.contains(locNode)))
+            || (top.partitionState(localNodeId(), part) == OWNING);
     }
 
     /** {@inheritDoc} */

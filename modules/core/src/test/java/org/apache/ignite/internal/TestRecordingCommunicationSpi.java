@@ -18,15 +18,23 @@
 package org.apache.ignite.internal;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.ignite.IgniteException;
 import org.apache.ignite.cluster.ClusterNode;
 import org.apache.ignite.internal.managers.communication.GridIoMessage;
+import org.apache.ignite.internal.util.typedef.T2;
 import org.apache.ignite.lang.IgniteInClosure;
+import org.apache.ignite.lang.IgnitePredicate;
 import org.apache.ignite.plugin.extensions.communication.Message;
 import org.apache.ignite.spi.IgniteSpiException;
 import org.apache.ignite.spi.communication.tcp.TcpCommunicationSpi;
 import org.jetbrains.annotations.Nullable;
+
+import static org.apache.ignite.internal.IgniteNodeAttributes.ATTR_GRID_NAME;
 
 /**
  *
@@ -38,15 +46,46 @@ public class TestRecordingCommunicationSpi extends TcpCommunicationSpi {
     /** */
     private List<Object> recordedMsgs = new ArrayList<>();
 
+    /** */
+    private List<T2<ClusterNode, GridIoMessage>> blockedMsgs = new ArrayList<>();
+
+    /** */
+    private Map<Class<?>, Set<String>> blockCls = new HashMap<>();
+
+    /** */
+    private IgnitePredicate<GridIoMessage> blockP;
+
     /** {@inheritDoc} */
     @Override public void sendMessage(ClusterNode node, Message msg, IgniteInClosure<IgniteException> ackC)
         throws IgniteSpiException {
         if (msg instanceof GridIoMessage) {
-            Object msg0 = ((GridIoMessage)msg).message();
+            GridIoMessage ioMsg = (GridIoMessage)msg;
+
+            Object msg0 = ioMsg.message();
 
             synchronized (this) {
                 if (recordCls != null && msg0.getClass().equals(recordCls))
                     recordedMsgs.add(msg0);
+
+                boolean block = false;
+
+                if (blockP != null && blockP.apply(ioMsg))
+                    block = true;
+                else {
+                    Set<String> blockNodes = blockCls.get(msg0.getClass());
+
+                    if (blockNodes != null) {
+                        String nodeName = (String)node.attributes().get(ATTR_GRID_NAME);
+
+                        block = blockNodes.contains(nodeName);
+                    }
+                }
+
+                if (block) {
+                    blockedMsgs.add(new T2<>(node, ioMsg));
+
+                    return;
+                }
             }
         }
 
@@ -72,6 +111,47 @@ public class TestRecordingCommunicationSpi extends TcpCommunicationSpi {
             recordedMsgs = new ArrayList<>();
 
             return msgs;
+        }
+    }
+
+    /**
+     * @param blockP Message block predicate.
+     */
+    public void blockMessages(IgnitePredicate<GridIoMessage> blockP) {
+        synchronized (this) {
+            this.blockP = blockP;
+        }
+    }
+
+    /**
+     * @param cls Message class.
+     * @param nodeName Node name.
+     */
+    public void blockMessages(Class<?> cls, String nodeName) {
+        synchronized (this) {
+            Set<String> set = blockCls.get(cls);
+
+            if (set == null) {
+                set = new HashSet<>();
+
+                blockCls.put(cls, set);
+            }
+
+            set.add(nodeName);
+        }
+    }
+
+    /**
+     * Stops block messages and sends all already blocked messages.
+     */
+    public void stopBlock() {
+        synchronized (this) {
+            blockCls.clear();
+
+            for (T2<ClusterNode, GridIoMessage> msg : blockedMsgs)
+                super.sendMessage(msg.get1(), msg.get2());
+
+            blockedMsgs.clear();
         }
     }
 }
