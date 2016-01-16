@@ -1001,7 +1001,8 @@ public class GridNioServer<T> {
 
                         assert msg != null;
 
-                        writer.setCurrentWriteClass(msg.getClass());
+                        if (writer != null)
+                            writer.setCurrentWriteClass(msg.getClass());
 
                         finished = msg.writeTo(buf, writer);
 
@@ -1025,7 +1026,8 @@ public class GridNioServer<T> {
 
                         assert msg != null;
 
-                        writer.setCurrentWriteClass(msg.getClass());
+                        if (writer != null)
+                            writer.setCurrentWriteClass(msg.getClass());
 
                         finished = msg.writeTo(buf, writer);
 
@@ -1171,7 +1173,8 @@ public class GridNioServer<T> {
 
                 assert msg != null;
 
-                writer.setCurrentWriteClass(msg.getClass());
+                if (writer != null)
+                    writer.setCurrentWriteClass(msg.getClass());
 
                 finished = msg.writeTo(buf, writer);
 
@@ -1197,7 +1200,8 @@ public class GridNioServer<T> {
 
                 assert msg != null;
 
-                writer.setCurrentWriteClass(msg.getClass());
+                if (writer != null)
+                    writer.setCurrentWriteClass(msg.getClass());
 
                 finished = msg.writeTo(buf, writer);
 
