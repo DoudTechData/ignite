@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 namespace Apache.Ignite.Core.Cache.Event
 {
     /// <summary>

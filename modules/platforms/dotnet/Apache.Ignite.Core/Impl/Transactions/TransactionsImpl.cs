@@ -90,7 +90,6 @@ namespace Apache.Ignite.Core.Impl.Transactions
             return TxStart(concurrency, isolation, _dfltTimeout, 0);
         }
 
-
         /** <inheritDoc /> */
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public ITransaction TxStart(TransactionConcurrency concurrency, TransactionIsolation isolation,

@@ -1046,7 +1046,6 @@ namespace Apache.Ignite.Core.Impl.Binary
             _stream = stream;
         }
 
-
         /// <summary>
         /// Write object.
         /// </summary>

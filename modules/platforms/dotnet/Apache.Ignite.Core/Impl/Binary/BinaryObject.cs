@@ -146,6 +146,7 @@ namespace Apache.Ignite.Core.Impl.Binary
             if (_deserialized == null)
             {
                 T res;
+
                 using (IBinaryStream stream = new BinaryHeapStream(_data))
                 {
                     stream.Seek(_offset, SeekOrigin.Begin);

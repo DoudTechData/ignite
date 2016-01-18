@@ -19,6 +19,7 @@ namespace Apache.Ignite.Core.Events
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using Apache.Ignite.Core.Binary;
     using Apache.Ignite.Core.Cluster;
@@ -203,10 +204,9 @@ namespace Apache.Ignite.Core.Events
         /// </summary>
         /// <param name="reader">Reader.</param>
         /// <returns>Node or null.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
         protected static IClusterNode ReadNode(IBinaryRawReader reader)
         {
-            IgniteArgumentCheck.NotNull(reader, "reader");
-
             return ((BinaryReader)reader).Marshaller.Ignite.GetNode(reader.ReadGuid());
         }
     }

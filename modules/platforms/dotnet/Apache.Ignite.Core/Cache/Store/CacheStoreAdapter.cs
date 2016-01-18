@@ -19,6 +19,7 @@ namespace Apache.Ignite.Core.Cache.Store
 {
     using System;
     using System.Collections;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using Apache.Ignite.Core.Impl.Common;
 
@@ -73,10 +74,9 @@ namespace Apache.Ignite.Core.Cache.Store
         /// Writes all.
         /// </summary>
         /// <param name="entries">The map.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
         public virtual void WriteAll(IDictionary entries)
         {
-            IgniteArgumentCheck.NotNull(entries, "entries");
-
             foreach (DictionaryEntry entry in entries)
                 Write(entry.Key, entry.Value);
         }
@@ -98,10 +98,9 @@ namespace Apache.Ignite.Core.Cache.Store
         /// <param name="keys">a mutable collection of keys for entries to delete. Upon invocation,
         /// it contains the keys to delete for write-through. Upon return the collection must only contain
         /// the keys that were not successfully deleted.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
         public virtual void DeleteAll(ICollection keys)
         {
-            IgniteArgumentCheck.NotNull(keys, "keys");
-
             foreach (object key in keys)
                 Delete(key);
         }

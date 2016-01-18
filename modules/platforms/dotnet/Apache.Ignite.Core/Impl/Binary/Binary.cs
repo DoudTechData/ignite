@@ -50,7 +50,6 @@ namespace Apache.Ignite.Core.Impl.Binary
 
             using (var stream = new BinaryHeapStream(1024))
             {
-
                 // Serialize.
                 BinaryWriter writer = _marsh.StartMarshal(stream);
 

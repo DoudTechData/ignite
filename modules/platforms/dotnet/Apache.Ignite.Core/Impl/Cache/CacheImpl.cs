@@ -1037,6 +1037,7 @@ namespace Apache.Ignite.Core.Impl.Cache
             catch (Exception)
             {
                 hnd.Dispose();
+
                 throw;
             }
         }
